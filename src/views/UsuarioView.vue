@@ -7,16 +7,24 @@
     <p><input type="password" v-model="senha"/></p>
     <button @click="buscarUsuarios">Atualizar</button>
     <button @click="incluir">Incluir</button>
+
+    <p><input type="date" v-model="demissao"/></p>
+    <p><input type="text" v-model="nomeDemissao"/></p>
+    <button @click="demitir">Demitir</button>
+    
     <p>{{ erro }}</p>
     <table>
       <thead>
         <td>Id</td>
         <td>Nome</td>
+        <td>Situação</td>
       </thead>
       <tbody>
         <tr v-for="usuario in usuarios" :key="usuario.id">
           <td>{{ usuario.id }}</td>
           <td>{{ usuario.nome }}</td>
+          <td v-if = 'usuario.demissao'>Demitido em {{ usuario.demissao }}</td>
+          <td v-else >Ativo</td>
         </tr>
       </tbody>
     </table>
@@ -31,6 +39,8 @@
   const senha = ref("123");
   const usuarios = ref();
   const erro = ref("");
+  const demissao = ref("");
+  const nomeDemissao = ref("");
 
   async function incluir() {
     erro.value = "";
@@ -39,6 +49,21 @@
         {
           nome: nome.value,
           senha: senha.value
+        });
+    }
+    catch(e) {
+      erro.value = (e as Error).message;
+    }
+    buscarUsuarios();
+  }
+
+  async function demitir() {
+    erro.value = "";
+    try{
+      await axios.patch("usuario", 
+        {
+          nome: nomeDemissao.value,
+          demissao: demissao.value
         });
     }
     catch(e) {
